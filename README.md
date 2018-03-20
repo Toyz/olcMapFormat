@@ -41,18 +41,62 @@ type tileParams struct {
 _Header_ struct contains the following data
 ```golang
 type header struct {
-	Size    int `struc:"int8,little,sizeof=Type"` // Is Size of Type which is the length
-	Type    string // Always SPRMAP (making size 6)
-	Version int `struc:"int8"` // Current version 1
-	Data    mapData // the data of the physical map
+    // Is Size of Type which is the length
+    Size    int `struc:"int8,little,sizeof=Type"` 
+    // Always SPRMAP (making size 6)
+    Type    string
+    // Current Version 1
+    Version int `struc:"int8"`
+    // Physical map information such as tiles
+    Data    mapData 
 }
 ```
 
 _MapData_ struct contains the information about the give map
+```golang
+type mapData struct {
+    // Size of the name
+    Size       int `struc:"int32,little,sizeof=Name"` 
+    // Physical map name
+    Name       string
+    // Map Width
+    Width      int `struc:"int32"`
+    // Map height
+    Height     int `struc:"int32"`
+    // Total tiles in the map
+    TilesCount int `struc:"int32,little,sizeof=Tiles"`
+    // Physical tile content
+	Tiles      []tileData
+}
+```
 
 _TileData_ contains the given information on what a tile is in the engine such as TileID (the ID in the sprite sheet) and the Position which is the IDX of a 1D array, and the params
+```golang
+type tileData struct {
+    // x + y * w is the Position
+    Position   int `struc:"int32"`
+    // ID from the Sprite Sheet
+    TileID     int `struc:"int32"`
+    // Total Params for this tile
+    ParamsSize int `struc:"int32,little,sizeof=Params"`
+    // Array of all Params (EX isSolid, Trigger)
+    Params     []tileParams
+}
+```
 
 _TileParams_ are the intresting field in this as they are the _Rules_ you set for the tile such as Trigger or Solid... These rules can be dyamic as are basically a simple form of Key -> Value design
+```golang
+type tileParams struct {
+    // Param name Size
+    ParamNameSize int `struc:"int32,little,sizeof=ParamName"`
+    // Param name ex (isSolid, Trigger)
+    ParamName     string
+    // Payload size
+    MetaSize      int    `struc:"int32,little,sizeof=Meta"`
+    // Payload can be anything... But will always save as a string
+    Meta          string 
+}
+```
 
 # Implementations
 Coming Soon...
