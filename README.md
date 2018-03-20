@@ -66,7 +66,7 @@ type mapData struct {
     // Total tiles in the map
     TilesCount int `struc:"int32,little,sizeof=Tiles"`
     // Physical tile content
-	Tiles      []tileData
+    Tiles      []tileData
 }
 ```
 
