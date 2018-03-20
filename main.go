@@ -105,13 +105,13 @@ func getInputMapName(fp string) string {
 	return strings.TrimSuffix(basename, filepath.Ext(basename))
 }
 
-func readMapFile(fp string) (map[int][]string, []string, string) {
+func readMapFile(fp string) ([][]string, []string, string) {
 	by, _ := ioutil.ReadFile(fp)
 
 	contents := string(by)
 
 	lines := strings.Split(contents, "\n")
-	values := make(map[int][]string)
+	values := make([][]string, len(lines))
 
 	for l := 0; l < len(lines); l++ {
 		values[l] = strings.Split(lines[l], " ")
