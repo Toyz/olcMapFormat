@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -21,12 +22,25 @@ var (
 
 func main() {
 	log.SetPrefix("[olcMapFormat] ")
-
 	flag.Parse()
 
-	lines, _, _ := readMapFile(*inputMap)
+	if len(*inputMap) <= 0 || !fileExist(*inputMap) {
+		log.Fatalf("%s does not exist!\n", *inputMap)
+		os.Exit(1)
+	}
 
-	mapName := getInputMapName(*inputMap)
+	if len(*outPutFile) <= 0 {
+		out := fmt.Sprintf("%s.map", getInputMapName(*inputMap))
+		outPutFile = &out
+	}
+
+	handleCreate(*inputMap, *outPutFile)
+}
+
+func handleCreate(input, output string) {
+	lines, _, _ := readMapFile(input)
+
+	mapName := getInputMapName(input)
 	log.Printf("Reading Map: %s\n", mapName)
 	log.Printf("Width x Height: %s x %s\n", lines[0][0], lines[0][1])
 	log.Printf("Map Payload Size: %v\n", len(lines[1]))
@@ -69,14 +83,14 @@ func main() {
 		log.Panicln(err)
 	}
 
-	fOpen, _ := os.Create(*outPutFile)
+	fOpen, _ := os.Create(output)
 	fOpen.Write(buf.Bytes())
 	fOpen.Close()
 
 	if *validate {
 		log.Println("Validating File...")
 		head := &header{}
-		fRead, _ := os.Open(*outPutFile)
+		fRead, _ := os.Open(output)
 		struc.Unpack(fRead, head)
 		mData := head.Data
 
@@ -91,6 +105,15 @@ func main() {
 			log.Println(tile)
 		}
 	}
+}
+
+func fileExist(name string) bool {
+	if _, err := os.Stat(name); err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return true
 }
 
 func toInt(value string) int {
