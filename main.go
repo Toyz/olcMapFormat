@@ -19,29 +19,6 @@ var (
 	validate   = flag.Bool("validate", true, "To validate the output")
 )
 
-type sprHeader struct {
-	Size       int `struc:"int32,little,sizeof=Name"`
-	Name       string
-	Width      int `struc:"int32"`
-	Height     int `struc:"int32"`
-	TilesCount int `struc:"int32,little,sizeof=Tiles"`
-	Tiles      []tileData
-}
-
-type tileData struct {
-	Position   int `struc:"int32"`
-	TileID     int `struc:"int32"`
-	ParamsSize int `struc:"int32,little,sizeof=Params"`
-	Params     []tileParams
-}
-
-type tileParams struct {
-	ParamNameSize int `struc:"int32,little,sizeof=ParamName"`
-	ParamName     string
-	MetaSize      int    `struc:"int32,little,sizeof=Meta"`
-	Meta          string // String is required for this... So in the engine you must handle this as is
-}
-
 func main() {
 	log.SetPrefix("[olcMapFormat] ")
 
@@ -53,10 +30,10 @@ func main() {
 	log.Printf("Reading Map: %s\n", mapName)
 	log.Printf("Width x Height: %s x %s\n", lines[0][0], lines[0][1])
 	log.Printf("Map Payload Size: %v\n", len(lines[1]))
-	log.Printf("Map Object Count: %v\n", len(lines[1]))
-	log.Printf("Map Collision Count: %v\n", len(lines[1]))
+	log.Printf("Map Object Count: %v\n", len(lines[1])/2)
+	log.Printf("Map Collision Count: %v\n", len(lines[1])/2)
 
-	header := &sprHeader{
+	mapData := mapData{
 		0,
 		mapName,
 		toInt(lines[0][0]),
@@ -65,9 +42,10 @@ func main() {
 		make([]tileData, 0),
 	}
 
+	id := 0
 	for i := 1; i < len(lines[1]); i += 2 {
 		tile := tileData{
-			i - 1,
+			id,
 			toInt(lines[1][i-1]),
 			0,
 			make([]tileParams, 0),
@@ -77,12 +55,16 @@ func main() {
 			0, "solid", 0, lines[1][i],
 		})
 
-		header.Tiles = append(header.Tiles, tile)
+		mapData.Tiles = append(mapData.Tiles, tile)
+		id++
+	}
 
+	sprHeader := &header{
+		0, "SPRMAP", 1, mapData,
 	}
 
 	var buf bytes.Buffer
-	err := struc.Pack(&buf, header)
+	err := struc.Pack(&buf, sprHeader)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -93,17 +75,19 @@ func main() {
 
 	if *validate {
 		log.Println("Validating File...")
-		head := &sprHeader{}
+		head := &header{}
 		fRead, _ := os.Open(*outPutFile)
 		struc.Unpack(fRead, head)
+		mData := head.Data
 
-		log.Printf("Map Name: %s\n", head.Name)
-		log.Printf("Map Name Size: %d\n", head.Size)
-		log.Printf("Map Size: %dx%d\n", head.Width, head.Height)
-		log.Printf("Tile Size: %d\n", len(header.Tiles))
+		log.Printf("TYPE: %s Version: %d", head.Type, head.Version)
+		log.Printf("Map Name: %s\n", mData.Name)
+		log.Printf("Map Name Size: %d\n", mData.Size)
+		log.Printf("Map Size: %dx%d\n", mData.Width, mData.Height)
+		log.Printf("Tile Size: %d\n", len(mData.Tiles))
 
 		log.Println("Dumping Tile Data...")
-		for _, tile := range head.Tiles {
+		for _, tile := range mData.Tiles {
 			log.Println(tile)
 		}
 	}
