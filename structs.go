@@ -1,9 +1,8 @@
 package main
 
 type header struct {
-	Size    int `struc:"int8,little,sizeof=Type"`
-	Type    string
-	Version int `struc:"int8"`
+	Type    string `struc:"[6]int16"`
+	Version int    `struc:"int8"`
 	Data    mapData
 }
 
@@ -24,8 +23,7 @@ type tileData struct {
 }
 
 type tileParams struct {
-	ParamNameSize int `struc:"int32,little,sizeof=ParamName"`
-	ParamName     string
-	MetaSize      int    `struc:"int32,little,sizeof=Meta"`
-	Meta          string // String is required for this... So in the engine you must handle this as is
+	ParamName string `struc:"[32]int16"` // Max length is 32 bytes
+	MetaSize  int    `struc:"int32,little,sizeof=Meta"`
+	Meta      string // String is required for this... So in the engine you must handle this as is
 }

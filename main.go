@@ -65,8 +65,9 @@ func handleCreate(input, output string) {
 			make([]tileParams, 0),
 		}
 
+		word := "solid"
 		tile.Params = append(tile.Params, tileParams{
-			0, "solid", 0, lines[1][i],
+			padRight(word, 32, " "), 0, lines[1][i],
 		})
 
 		mapData.Tiles = append(mapData.Tiles, tile)
@@ -74,13 +75,13 @@ func handleCreate(input, output string) {
 	}
 
 	sprHeader := &header{
-		0, "SPRMAP", 1, mapData,
+		"SPRMAP", 2, mapData,
 	}
 
 	var buf bytes.Buffer
 	err := struc.Pack(&buf, sprHeader)
 	if err != nil {
-		log.Panicln(err)
+		log.Fatalln(err)
 	}
 
 	fOpen, _ := os.Create(output)
@@ -105,6 +106,17 @@ func handleCreate(input, output string) {
 			log.Println(tile)
 		}
 	}
+}
+
+func times(str string, n int) (out string) {
+	for i := 0; i < n; i++ {
+		out += str
+	}
+	return
+}
+
+func padRight(str string, length int, pad string) string {
+	return str + times(pad, length-len(str))
 }
 
 func fileExist(name string) bool {
