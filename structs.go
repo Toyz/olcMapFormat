@@ -29,10 +29,10 @@ type tile struct {
 	Position   int `struc:"int32"`
 	TileID     int `struc:"int32"`
 	ParamsSize int `struc:"int32,sizeof=Params"`
-	Params     []params
+	Params     []param
 }
 
-type params struct {
+type param struct {
 	KeySize   int `struc:"int32,sizeof=Key"`
 	Key       string
 	ValueSize int `struc:"int32,sizeof=Value"`

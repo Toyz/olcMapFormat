@@ -68,13 +68,13 @@ type tile struct {
     // Total Params for this tile
     ParamsSize int `struc:"int32,little,sizeof=Params"`
     // Array of all Params (EX isSolid, isTrigger)
-    Params     []tileParams
+    Params     []param
 }
 ```
 
 _TileParams_ are the intresting field in this as they are the _Rules_ you set for the tile such as Trigger or Solid... These rules can be dyamic as are basically a simple form of `Key -> Value` design
 ```golang
-type tileParams struct {
+type param struct {
     //Size of the Key 
     KeySize   int `struc:"int32,little,sizeof=Key"`
     // Key name (ex: isSolid, isTrigger)

@@ -8,6 +8,6 @@ func createLayer(name string) layer {
 
 func createTile(pos int, tid int) tile {
 	return tile{
-		pos, tid, 0, make([]params, 0),
+		pos, tid, 0, make([]param, 0),
 	}
 }
