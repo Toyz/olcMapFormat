@@ -17,17 +17,6 @@ func createTile(pos int, tid int) tile {
 	}
 }
 
-func times(str string, n int) (out string) {
-	for i := 0; i < n; i++ {
-		out += str
-	}
-	return
-}
-
-func padRight(str string, length int, pad string) string {
-	return str + times(pad, length-len(str))
-}
-
 func fileExist(name string) bool {
 	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
