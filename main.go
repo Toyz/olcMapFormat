@@ -48,8 +48,7 @@ func handleCreate(input, output string) {
 	log.Printf("Map Collision Count: %v\n", len(lines[1])/2)
 
 	mapData := mapData{
-		0,
-		mapName,
+		padRight(mapName, 32, " "),
 		toInt(lines[0][0]),
 		toInt(lines[0][1]),
 		0,
@@ -97,7 +96,6 @@ func handleCreate(input, output string) {
 
 		log.Printf("TYPE: %s Version: %d", head.Type, head.Version)
 		log.Printf("Map Name: %s\n", mData.Name)
-		log.Printf("Map Name Size: %d\n", mData.Size)
 		log.Printf("Map Size: %dx%d\n", mData.Width, mData.Height)
 		log.Printf("Tile Size: %d\n", len(mData.Tiles))
 
