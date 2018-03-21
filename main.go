@@ -51,31 +51,27 @@ func handleCreate(input, output string) {
 	log.Printf("Map Object Count: %v\n", len(lines[1])/2)
 	log.Printf("Map Collision Count: %v\n", len(lines[1])/2)
 
-	mapData := mapData{}
+	mapData := mapBase{}
 	mapData.MapNameSize = 0
 	mapData.MapName = mapName
 	mapData.MapDescSize = 0
 	mapData.MapDesc = fmt.Sprintf("This map is called: %s", mapName)
 	mapData.Width = toInt(lines[0][0])
 	mapData.Height = toInt(strings.TrimSpace(lines[0][1]))
-	mapData.TilesCount = 0
-	mapData.Tiles = make([]tileData, 0)
+	mapData.LayersCount = 0
+	mapData.Layers = make([]layer, 0)
+	mapData.Layers = append(mapData.Layers, createLayer("background"))
+	mapData.Layers = append(mapData.Layers, createLayer("collision"))
 
+	pos := 0
 	for i := 1; i < len(lines[1]); i += 2 {
-		tile := tileData{
-			toInt(lines[1][i-1]),
-			0,
-			make([]tileParams, 0),
-		}
+		tid := toInt(lines[1][i-1])
+		mapData.Layers[0].Tiles = append(mapData.Layers[0].Tiles, createTile(pos, tid))
 
-		word := "isSolid"
 		if lines[1][i] == "1" {
-			tile.Params = append(tile.Params, tileParams{
-				0, word, 0, lines[1][i],
-			})
+			mapData.Layers[1].Tiles = append(mapData.Layers[1].Tiles, createTile(pos, -1))
 		}
-
-		mapData.Tiles = append(mapData.Tiles, tile)
+		pos++
 	}
 	sprHeader := &header{
 		0, "SPRMAP", 2, mapData,
@@ -102,14 +98,18 @@ func handleCreate(input, output string) {
 		log.Printf("Map Name: %s\n", mData.MapName)
 		log.Printf("Map Desc: %s\n", mData.MapDesc)
 		log.Printf("Map Size: %dx%d\n", mData.Width, mData.Height)
-		log.Printf("Tile Size: %d\n", len(mData.Tiles))
+		log.Printf("Total Layer Size: %d\n", len(mData.Layers))
 
-		log.Println("Dumping Tile Data...")
-		for tid, tile := range mData.Tiles {
-			log.Printf("IDX: %d TileID: %d\n", tid, tile.TileID)
-			if tile.ParamsSize > 0 {
-				for _, param := range tile.Params {
-					log.Printf("%s -> %s\n", param.Key, param.Value)
+		log.Println("Dumping Layer Info")
+
+		for _, layer := range mData.Layers {
+			log.Printf("Data for layer %s total tiles %d", layer.Name, layer.TilesCount)
+			for _, tile := range layer.Tiles {
+				log.Printf("IDX: %d TileID: %d\n", tile.Position, tile.TileID)
+				if tile.ParamsSize > 0 {
+					for _, param := range tile.Params {
+						log.Printf("%s -> %s\n", param.Key, param.Value)
+					}
 				}
 			}
 		}
