@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/lunixbochs/struc"
@@ -115,32 +114,6 @@ func handleCreate(input, output string) {
 			}
 		}
 	}
-}
-
-func times(str string, n int) (out string) {
-	for i := 0; i < n; i++ {
-		out += str
-	}
-	return
-}
-
-func padRight(str string, length int, pad string) string {
-	return str + times(pad, length-len(str))
-}
-
-func fileExist(name string) bool {
-	if _, err := os.Stat(name); err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-	}
-	return true
-}
-
-func toInt(value string) int {
-	i, _ := strconv.Atoi(value)
-
-	return i
 }
 
 func getInputMapName(fp string) string {
