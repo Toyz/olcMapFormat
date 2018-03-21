@@ -25,7 +25,7 @@ type tileData struct {
 }
 
 type tileParams struct {
-	Size      int `struc:"int32,little,sizeof=Key"`
+	KeySize   int `struc:"int32,little,sizeof=Key"`
 	Key       string
 	ValueSize int `struc:"int32,little,sizeof=Value"`
 	Value     string
