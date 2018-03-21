@@ -69,7 +69,8 @@ func handleCreate(input, output string) {
 		mapData.Layers[0].Tiles = append(mapData.Layers[0].Tiles, createTile(pos, tid))
 
 		if lines[1][i] == "1" {
-			mapData.Layers[1].Tiles = append(mapData.Layers[1].Tiles, createTile(pos, -1))
+			// TODO: Figure out why TileID cannot be -1
+			mapData.Layers[1].Tiles = append(mapData.Layers[1].Tiles, createTile(pos, tid))
 		}
 		pos++
 	}
