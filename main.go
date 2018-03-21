@@ -25,7 +25,11 @@ func main() {
 	flag.Parse()
 
 	if len(*inputMap) <= 0 || !fileExist(*inputMap) {
-		log.Fatalf("%s does not exist!\n", *inputMap)
+		msg := fmt.Sprintf("%s does not exist!\n", *inputMap)
+		if len(*inputMap) <= 0 {
+			msg = "Input file cannot be empty"
+		}
+		log.Fatal(msg)
 		os.Exit(1)
 	}
 
