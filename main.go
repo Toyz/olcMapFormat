@@ -47,34 +47,34 @@ func handleCreate(input, output string) {
 	log.Printf("Map Object Count: %v\n", len(lines[1])/2)
 	log.Printf("Map Collision Count: %v\n", len(lines[1])/2)
 
-	mapData := mapData{
-		padRight(mapName, 32, " "),
-		toInt(lines[0][0]),
-		toInt(lines[0][1]),
-		0,
-		make([]tileData, 0),
-	}
+	mapData := mapData{}
+	mapData.MapNameSize = 0
+	mapData.MapName = mapName
+	mapData.MapDescSize = 0
+	mapData.MapDesc = fmt.Sprintf("This map is called: %s", mapName)
+	mapData.Width = toInt(lines[0][0])
+	mapData.Height = toInt(strings.TrimSpace(lines[0][1]))
+	mapData.TilesCount = 0
+	mapData.Tiles = make([]tileData, 0)
 
-	id := 0
 	for i := 1; i < len(lines[1]); i += 2 {
 		tile := tileData{
-			id,
 			toInt(lines[1][i-1]),
 			0,
 			make([]tileParams, 0),
 		}
 
-		word := "solid"
-		tile.Params = append(tile.Params, tileParams{
-			padRight(word, 32, " "), 0, lines[1][i],
-		})
+		word := "isSolid"
+		if lines[1][i] == "1" {
+			tile.Params = append(tile.Params, tileParams{
+				0, word, 0, lines[1][i],
+			})
+		}
 
 		mapData.Tiles = append(mapData.Tiles, tile)
-		id++
 	}
-
 	sprHeader := &header{
-		"SPRMAP", 2, mapData,
+		0, "SPRMAP", 2, mapData,
 	}
 
 	var buf bytes.Buffer
@@ -95,13 +95,19 @@ func handleCreate(input, output string) {
 		mData := head.Data
 
 		log.Printf("TYPE: %s Version: %d", head.Type, head.Version)
-		log.Printf("Map Name: %s\n", mData.Name)
+		log.Printf("Map Name: %s\n", mData.MapName)
+		log.Printf("Map Desc: %s\n", mData.MapDesc)
 		log.Printf("Map Size: %dx%d\n", mData.Width, mData.Height)
 		log.Printf("Tile Size: %d\n", len(mData.Tiles))
 
 		log.Println("Dumping Tile Data...")
-		for _, tile := range mData.Tiles {
-			log.Println(tile)
+		for tid, tile := range mData.Tiles {
+			log.Printf("IDX: %d TileID: %d\n", tid, tile.TileID)
+			if tile.ParamsSize > 0 {
+				for _, param := range tile.Params {
+					log.Printf("%s -> %s\n", param.Key, param.Value)
+				}
+			}
 		}
 	}
 }
