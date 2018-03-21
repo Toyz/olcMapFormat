@@ -73,7 +73,7 @@ node_modules
 
 #_testmain.go
 
-#*.exe
+*.exe
 *.csv
 
 debug
